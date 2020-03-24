@@ -21,6 +21,6 @@ from cnblogSearchEngine import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^$',views.home,name='home'),
+    url(r'^$',views.home,name='index'),
     url(r'^search',views.dosearch,name='search')
 ]
