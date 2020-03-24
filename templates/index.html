@@ -18,6 +18,18 @@
                 <input type="text" class="searchInput" />
                 <input type="button" class="searchButton" onclick="do_search()" />
             </div>
+            <div class="historyArea">
+                <p class="history mysearch">
+                    <label>我的搜索：</label>
+                    <span id="all-search">
+                        <a href="javascript:;"></a>
+                        <a href="javascript:;"></a>
+                        <a href="javascript:;"></a>
+                        <a href="javascript:;"></a>
+                    </span>
+
+                </p>
+            </div>
         </div>
     </div>
 </div>
@@ -25,9 +37,45 @@
 <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
 <script>
     let search_url = '{% url "search" %}'
+    let searchArr = []
+    if(localStorage.search2)
+    {
+        searchArr = localStorage.search2.split(',')
+    }
+
+
+    let arrLen = searchArr.length
+    if(arrLen > 6)
+    {
+        arrLen = 6
+    }
+
+    html = ''
+    for(let i = 0; i < arrLen;i++)
+    {
+        let tagA = `<a href="javascript:;">${searchArr[i]}</a>`
+        html+=tagA
+    }
+
+    //$('#all-search').html(html)
+    document.getElementById('all-search').innerHTML = html
     function do_search(){
         let keyword = $('.searchInput').val()
         window.location.href=search_url+'?q='+keyword
+        for(let i = 0; i < searchArr.length;i++)
+        {
+            if(keyword == searchArr[i])
+            {
+                searchArr.splice(i,1)
+                break
+            }
+        }
+
+        if(keyword.length>=2)
+        {
+            searchArr.unshift(keyword)
+            localStorage.search2 = searchArr
+        }
     }
 </script>
 </html>
