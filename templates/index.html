@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body>
+<div id="container">
+    <div id="bd">
+        <div id="main">
+            <h1 class="title">
+                <a href="#"><div class="logo large"></div></a>
+            </h1>
+            <div class="inputArea">
+                <input type="text" class="searchInput" />
+                <input type="button" class="searchButton" onclick="do_search()" />
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+<script>
+    let search_url = '{% url "search" %}'
+    function do_search(){
+        let keyword = $('.searchInput').val()
+        window.location.href=search_url+'?q='+keyword
+    }
+</script>
+</html>
