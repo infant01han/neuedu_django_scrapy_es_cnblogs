@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.shortcuts import render
 from elasticsearch import Elasticsearch
 # Create your views here.
@@ -8,6 +10,11 @@ def home(request):
 
 def dosearch(request):
     keyword = request.GET.get('q','')
+    pageIndex = request.GET.get('page','1')
+    try:
+        pageIndex = int(pageIndex)
+    except:
+        pageIndex = 1
 
     body = {
         'query':{
@@ -16,6 +23,8 @@ def dosearch(request):
                 'fields':['title','description']
             }
         },
+        'from':(pageIndex-1)*10,
+        'size':10,
         'highlight':{
             'pre_tags':['<span class="keyWord">'],
             'post_tags':['</span>'],
@@ -25,8 +34,14 @@ def dosearch(request):
             }
         }
     }
+    start_time = datetime.now()
     response = client.search(index='cnblogs_new',doc_type='doc',body=body)
-    print(response)
+    # print(response)
+    total_nums = response["hits"]["total"]
+    if total_nums%10==0:
+        page_nums=int(total_nums/10)
+    else:
+        page_nums=int(total_nums/10)+1
     hit_list=[]
     for hit in response['hits']['hits']:
         hit_dic = {}
@@ -36,10 +51,21 @@ def dosearch(request):
             hit_dic['tltle']=hit['_source']['title']
 
         hit_dic['url'] = hit['_source']['url']
+        hit_dic['article_date'] = hit['_source']['article_date']
+        hit_dic['score'] = hit['_score']
+        hit_dic["source_site"] = "博客园"
+
 
         if 'description' in hit['highlight']:
             hit_dic['description']=''.join(hit['highlight']['description'])
         else:
             hit_dic['description']=hit['_source']['description']
         hit_list.append(hit_dic)
-    return render(request,'results.html',{'all_hits':hit_list})
+    end_time = datetime.now()
+    last_time = (end_time-start_time).total_seconds()
+    return render(request,'results.html',{'all_hits':hit_list,
+                                          'pageIndex':pageIndex,
+                                          'keyword':keyword,
+                                          'page_nums':page_nums,
+                                          'total_nums':total_nums,
+                                          'last_time':last_time})
