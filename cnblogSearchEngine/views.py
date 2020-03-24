@@ -48,7 +48,7 @@ def dosearch(request):
         if 'title' in hit['highlight']:
             hit_dic['title']=''.join(hit['highlight']['title'])
         else:
-            hit_dic['tltle']=hit['_source']['title']
+            hit_dic['title']=hit['_source']['title']
 
         hit_dic['url'] = hit['_source']['url']
         hit_dic['article_date'] = hit['_source']['article_date']
